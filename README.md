@@ -31,9 +31,26 @@ The BDM Ultramarathon Companion is a specialized logistics, pacing, and navigati
 * **Mobile-First UX:** High-contrast Dark Mode, large touch targets, and a carefully managed z-index architecture for flawless field use.
 * **AI Integration:** "Pro Mode" utilizes the Gemini API for advanced analytics and image generation.
 
-## 🚀 Getting Started
+### 2. Release Notes Draft
 
-*(Add your specific installation instructions here based on your framework, e.g., React, Vue, Angular)*
+**Release Title: v1.1.0 - Strict Cutoffs, Smart Logistics & GPX Support**
+
+**🚀 New Features:**
+* **GPX Downloads:** Added a dedicated GPX Export button in the header and map views. Easily download 102km or 160km routes for your Garmin/Coros smartwatch.
+* **Race Clock & DNF Risk Analysis:** The Crew View now features a real-time race clock. It calculates the required pace to hit the dreaded 50km (9h) and 102km (18h) cutoffs, displaying "ON TRACK", "WARNING", or "CRITICAL" badges.
+* **AI Strategy Warnings:** The pacing tab now pulses a red "RISK OF DNF" warning if your target Run/Walk strategy mathematically misses the intermediate cutoffs. 
+
+**🛡️ Rule Enforcements & Logistics:**
+* **Dynamic Pacer Protocols:** Crew view now strictly enforces BDM rules. Pacer status explicitly shows "FORBIDDEN" (red) below 102km, switching to "ALLOWED" (green) at the 102km mark for the 160 distance.
+* **Start Time Reminders:** Added clear logistical reminders in the Race Selector (10:00 PM for 102k, 05:00 AM for 160k).
+
+**🛠️ Refinements & Bug Fixes:**
+* **Offline Caching:** Enhanced the `CacheService` to ensure the last viewed KM marker is remembered even after app restarts.
+* **UI/UX Fixes:** Resolved complex z-index layering issues between the sticky navigation, backdrops, and the race selector dropdown. 
+
+View the app in AI Studio: https://ai.studio/apps/a4adb5f9-bb96-4412-b3e7-8baeb0d96d27
+
+## 🚀 Getting Started
 
 ```bash
 # Clone the repository
@@ -41,8 +58,6 @@ git clone [https://github.com/yourusername/bdm-companion.git](https://github.com
 
 # Install dependencies
 npm install
-
-View the app in AI Studio: https://ai.studio/apps/a4adb5f9-bb96-4412-b3e7-8baeb0d96d27
 
 # Run the development server
 npm run dev
