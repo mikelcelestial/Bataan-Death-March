@@ -1,0 +1,7 @@
+{
+  "name": "BDM 102: Ultramarathon Companion",
+  "description": "A comprehensive app for the Bataan Death March 102km Ultramarathon, featuring an offline-capable route map, high-quality image generation with Gemini 3 Pro, and AI-powered photo editing.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
