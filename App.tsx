@@ -60,15 +60,17 @@ const App: React.FC = () => {
               <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <button 
                   onClick={() => { setRaceType(RaceType.BDM102); setShowRaceSelector(false); }}
-                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-slate-800 ${raceType === RaceType.BDM102 ? 'text-red-500 bg-red-500/5' : 'text-slate-300'}`}
+                  className={`w-full px-4 py-3 text-left transition-colors hover:bg-slate-800 border-b border-slate-800/50 ${raceType === RaceType.BDM102 ? 'bg-red-500/5' : ''}`}
                 >
-                  BDM 102 (Mariveles to SF)
+                  <div className={`text-sm font-bold ${raceType === RaceType.BDM102 ? 'text-red-500' : 'text-slate-300'}`}>BDM 102</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Start: 10:00 PM (22:00)</div>
                 </button>
                 <button 
                   onClick={() => { setRaceType(RaceType.BDM160); setShowRaceSelector(false); }}
-                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-slate-800 border-t border-slate-800 ${raceType === RaceType.BDM160 ? 'text-red-500 bg-red-500/5' : 'text-slate-300'}`}
+                  className={`w-full px-4 py-3 text-left transition-colors hover:bg-slate-800 ${raceType === RaceType.BDM160 ? 'bg-red-500/5' : ''}`}
                 >
-                  BDM 160 (Mariveles to Capas)
+                  <div className={`text-sm font-bold ${raceType === RaceType.BDM160 ? 'text-red-500' : 'text-slate-300'}`}>BDM 160</div>
+                  <div className="text-[10px] text-slate-500 font-medium">Start: 05:00 AM (05:00)</div>
                 </button>
                 
                 <div className="bg-slate-950/50 p-2 border-t border-slate-800">

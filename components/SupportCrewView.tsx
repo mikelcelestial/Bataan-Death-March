@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { RACE_DATA, LOGISTICS_CHECKLIST } from '../constants';
 import { CacheService } from '../services/cacheService';
 import { ChecklistItem, RaceType } from '../types';
-import { Truck, Users, CheckSquare, ListTodo, ChefHat, Info, Save, Plus, Trash2, X } from 'lucide-react';
+import { Truck, Users, CheckSquare, ListTodo, ChefHat, Info, Save, Plus, Trash2, X, Clock, AlertTriangle, TrendingUp, Timer } from 'lucide-react';
 
 interface SupportCrewViewProps {
   raceType: RaceType;
@@ -101,6 +101,69 @@ const SupportCrewView: React.FC<SupportCrewViewProps> = ({ raceType }) => {
     }
   };
 
+  const [elapsedHours, setElapsedHours] = useState(0);
+  const [elapsedMinutes, setElapsedMinutes] = useState(0);
+  const [currentPace, setCurrentPace] = useState(raceInfo.defaultPace);
+
+  useEffect(() => {
+    // Load persisted elapsed time and pace
+    const savedHours = CacheService.getState('crew_elapsed_hours');
+    const savedMinutes = CacheService.getState('crew_elapsed_minutes');
+    const savedPace = CacheService.getState('crew_current_pace');
+    
+    if (savedHours !== null) setElapsedHours(savedHours);
+    if (savedMinutes !== null) setElapsedMinutes(savedMinutes);
+    if (savedPace !== null) setCurrentPace(savedPace);
+  }, []);
+
+  const handleElapsedChange = (h: number, m: number) => {
+    setElapsedHours(h);
+    setElapsedMinutes(m);
+    CacheService.saveState('crew_elapsed_hours', h);
+    CacheService.saveState('crew_elapsed_minutes', m);
+    triggerSaveIndicator();
+  };
+
+  const handlePaceChange = (p: number) => {
+    setCurrentPace(p);
+    CacheService.saveState('crew_current_pace', p);
+    triggerSaveIndicator();
+  };
+
+  const calculateDNFRisk = () => {
+    const elapsedTotalMinutes = elapsedHours * 60 + elapsedMinutes;
+    const cutoffs = [
+      { km: 50, limit: 9 * 60 },
+      { km: 102, limit: 18 * 60 },
+      { km: raceInfo.distance, limit: raceType === RaceType.BDM102 ? 18 * 60 : 30 * 60 }
+    ];
+
+    const nextCutoff = cutoffs.find(c => c.km > currentKM) || cutoffs[cutoffs.length - 1];
+    const remainingKM = nextCutoff.km - currentKM;
+    const remainingMinutes = nextCutoff.limit - elapsedTotalMinutes;
+    const requiredPace = remainingMinutes / remainingKM;
+    
+    let riskLevel: 'low' | 'medium' | 'high' = 'low';
+    let recommendation = '';
+
+    if (currentPace > requiredPace) {
+      riskLevel = 'high';
+      recommendation = `CRITICAL: You need to average ${requiredPace.toFixed(1)} min/km to hit the KM ${nextCutoff.km} cutoff. Current pace is too slow.`;
+    } else if (currentPace > requiredPace - 0.5) {
+      riskLevel = 'medium';
+      recommendation = `WARNING: You are close to the cutoff. Maintain at least ${requiredPace.toFixed(1)} min/km.`;
+    } else {
+      riskLevel = 'low';
+      recommendation = `ON TRACK: Maintaining ${currentPace.toFixed(1)} min/km will clear the KM ${nextCutoff.km} cutoff with time to spare.`;
+    }
+
+    return { riskLevel, recommendation, requiredPace, nextCutoff };
+  };
+
+  const riskData = calculateDNFRisk();
+
+  const isPacerAllowed = raceType === RaceType.BDM160 && currentKM >= 102;
+
   const activeTask = raceInfo.crewTasks.find(t => t.km >= currentKM) || raceInfo.crewTasks[raceInfo.crewTasks.length - 1];
 
   return (
@@ -141,6 +204,108 @@ const SupportCrewView: React.FC<SupportCrewViewProps> = ({ raceType }) => {
         />
       </div>
 
+      {/* Race Clock & DNF Risk Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+          <div className="flex items-center gap-2 mb-4">
+            <Timer className="w-4 h-4 text-blue-500" />
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Race Clock (Elapsed)</h4>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <label className="block text-[8px] font-bold text-slate-600 uppercase mb-1">Hours</label>
+              <input 
+                type="number" min="0" max="48"
+                value={elapsedHours}
+                onChange={(e) => handleElapsedChange(parseInt(e.target.value) || 0, elapsedMinutes)}
+                className="w-full bg-slate-800 border border-slate-700 text-white text-xl font-black px-3 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-[8px] font-bold text-slate-600 uppercase mb-1">Minutes</label>
+              <input 
+                type="number" min="0" max="59"
+                value={elapsedMinutes}
+                onChange={(e) => handleElapsedChange(elapsedHours, parseInt(e.target.value) || 0)}
+                className="w-full bg-slate-800 border border-slate-700 text-white text-xl font-black px-3 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold text-slate-500 uppercase">Current Pace (min/km)</span>
+              <span className="text-xs font-black text-white">{currentPace.toFixed(1)}</span>
+            </div>
+            <input 
+              type="range" min="4" max="15" step="0.1"
+              value={currentPace}
+              onChange={(e) => handlePaceChange(parseFloat(e.target.value))}
+              className="w-full accent-blue-600 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+          <p className="text-[9px] text-slate-600 mt-3 italic">
+            Start Time: {raceInfo.startTime} | {raceInfo.pacerRule}
+          </p>
+        </div>
+
+        <div className={`border rounded-3xl p-5 shadow-lg transition-colors ${
+          riskData.riskLevel === 'high' ? 'bg-red-500/5 border-red-500/20' : 
+          riskData.riskLevel === 'medium' ? 'bg-yellow-500/5 border-yellow-500/20' : 
+          'bg-green-500/5 border-green-500/20'
+        }`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className={`w-4 h-4 ${
+                riskData.riskLevel === 'high' ? 'text-red-500' : 
+                riskData.riskLevel === 'medium' ? 'text-yellow-500' : 
+                'text-green-500'
+              }`} />
+              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">DNF Risk Analysis</h4>
+            </div>
+            <span className={`text-[8px] font-black px-2 py-0.5 rounded-full border uppercase ${
+              riskData.riskLevel === 'high' ? 'text-red-500 border-red-500/30 bg-red-500/10' : 
+              riskData.riskLevel === 'medium' ? 'text-yellow-500 border-yellow-500/30 bg-yellow-500/10' : 
+              'text-green-500 border-green-500/30 bg-green-500/10'
+            }`}>
+              {riskData.riskLevel} risk
+            </span>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase">Next Cutoff</p>
+              <p className="text-sm font-black text-white">KM {riskData.nextCutoff.km} @ {Math.floor(riskData.nextCutoff.limit / 60)}h 00m</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div>
+                <p className="text-[8px] font-bold text-slate-500 uppercase">Req. Pace</p>
+                <p className="text-xs font-black text-white">{riskData.requiredPace.toFixed(1)} <span className="text-[8px] font-normal text-slate-500">min/km</span></p>
+              </div>
+              <div className="h-6 w-px bg-slate-800" />
+              <div>
+                <p className="text-[8px] font-bold text-slate-500 uppercase">Buffer</p>
+                <p className={`text-xs font-black ${(riskData.requiredPace - currentPace) > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {(riskData.requiredPace - currentPace).toFixed(1)} <span className="text-[8px] font-normal text-slate-500">min/km</span>
+                </p>
+              </div>
+            </div>
+            <div className={`p-3 rounded-xl border ${
+              riskData.riskLevel === 'high' ? 'bg-red-500/10 border-red-500/20' : 
+              riskData.riskLevel === 'medium' ? 'bg-yellow-500/10 border-yellow-500/20' : 
+              'bg-green-500/10 border-green-500/20'
+            }`}>
+              <p className={`text-[10px] font-bold leading-relaxed ${
+                riskData.riskLevel === 'high' ? 'text-red-400' : 
+                riskData.riskLevel === 'medium' ? 'text-yellow-400' : 
+                'text-green-400'
+              }`}>
+                {riskData.recommendation}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Support Instructions Card */}
       <div className="space-y-4">
         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
@@ -155,9 +320,11 @@ const SupportCrewView: React.FC<SupportCrewViewProps> = ({ raceType }) => {
             desc={activeTask.driverTask}
           />
           <InstructionCard 
-            icon={<Users className="w-4 h-4 text-purple-400" />}
+            icon={<Users className={`w-4 h-4 ${isPacerAllowed ? 'text-green-400' : 'text-red-400'}`} />}
             title="Pacer Protocol"
             desc={activeTask.pacerTask}
+            highlight={!isPacerAllowed && raceType === RaceType.BDM160 ? 'FORBIDDEN' : isPacerAllowed ? 'ALLOWED' : 'FORBIDDEN'}
+            variant={isPacerAllowed ? 'success' : 'danger'}
           />
           <InstructionCard 
             icon={<ChefHat className="w-4 h-4 text-orange-400" />}
@@ -265,13 +432,28 @@ const SupportCrewView: React.FC<SupportCrewViewProps> = ({ raceType }) => {
   );
 };
 
-const InstructionCard = ({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) => (
-  <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex gap-4 items-start shadow-md hover:border-slate-700 transition-colors">
+const InstructionCard = ({ icon, title, desc, highlight, variant }: { icon: React.ReactNode, title: string, desc: string, highlight?: string, variant?: 'success' | 'danger' | 'default' }) => (
+  <div className={`bg-slate-900 border p-5 rounded-2xl flex gap-4 items-start shadow-md transition-colors ${
+    variant === 'success' ? 'border-green-500/30 bg-green-500/5' : 
+    variant === 'danger' ? 'border-red-500/30 bg-red-500/5' : 
+    'border-slate-800 hover:border-slate-700'
+  }`}>
     <div className="bg-slate-800 p-3 rounded-2xl flex-shrink-0 shadow-inner">
       {icon}
     </div>
-    <div className="pt-0.5">
-      <h5 className="text-xs font-black text-white mb-1 uppercase tracking-wider">{title}</h5>
+    <div className="pt-0.5 flex-1">
+      <div className="flex items-center justify-between mb-1">
+        <h5 className="text-xs font-black text-white uppercase tracking-wider">{title}</h5>
+        {highlight && (
+          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+            variant === 'success' ? 'bg-green-500 text-white' : 
+            variant === 'danger' ? 'bg-red-500 text-white' : 
+            'bg-slate-700 text-slate-300'
+          }`}>
+            {highlight}
+          </span>
+        )}
+      </div>
       <p className="text-[11px] text-slate-400 leading-relaxed font-medium">{desc}</p>
     </div>
   </div>

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from '@google/genai';
 import { RACE_DATA } from '../constants';
 import { RaceType } from '../types';
-import { Play, Pause, RotateCcw, Zap, Brain, ChevronRight, Info, Utensils, Droplets, Footprints, Target, Clock } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, Brain, ChevronRight, Info, Utensils, Droplets, Footprints, Target, Clock, ShieldCheck } from 'lucide-react';
 
 interface RunWalkStrategyProps {
   raceType: RaceType;
@@ -61,8 +61,18 @@ const RunWalkStrategy: React.FC<RunWalkStrategyProps> = ({ raceType }) => {
     const totalMinutes = paceGoal * raceInfo.distance;
     const hours = Math.floor(totalMinutes / 60);
     const mins = Math.round(totalMinutes % 60);
-    return `${hours}h ${mins}m`;
+    const isOverCutoff = raceType === RaceType.BDM102 ? hours >= 18 : hours >= 30;
+    
+    // Calculate intermediate cutoff risks
+    const km50Time = paceGoal * 50;
+    const km102Time = paceGoal * 102;
+    const is50KRisk = km50Time >= 9 * 60;
+    const is102KRisk = km102Time >= 18 * 60;
+
+    return { time: `${hours}h ${mins}m`, isOverCutoff, is50KRisk, is102KRisk };
   };
+
+  const finishData = calculateFinishTime();
 
   const getAdvice = async () => {
     setAdvisorLoading(true);
@@ -111,7 +121,16 @@ const RunWalkStrategy: React.FC<RunWalkStrategyProps> = ({ raceType }) => {
             <Clock className="w-3 h-3" />
             Pace Goal & Prediction
           </h4>
-          <span className="text-xs font-bold text-red-500">{calculateFinishTime()} Est. Finish</span>
+          <div className="text-right">
+            <span className={`text-xs font-bold ${finishData.isOverCutoff || finishData.is50KRisk || finishData.is102KRisk ? 'text-red-500' : 'text-green-500'}`}>
+              {finishData.time} Est. Finish
+            </span>
+            {(finishData.isOverCutoff || finishData.is50KRisk || finishData.is102KRisk) && (
+              <p className="text-[8px] font-black text-red-600 uppercase tracking-tighter mt-0.5 animate-pulse">
+                {finishData.isOverCutoff ? 'OVER FINAL CUTOFF' : 'RISK OF DNF AT CUTOFF'}
+              </p>
+            )}
+          </div>
         </div>
         <div className="space-y-4">
           <div>
@@ -125,6 +144,29 @@ const RunWalkStrategy: React.FC<RunWalkStrategyProps> = ({ raceType }) => {
               onChange={(e) => setPaceGoal(parseFloat(e.target.value))}
               className="w-full accent-red-500 h-1.5 bg-slate-800 rounded-lg appearance-none"
             />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="bg-red-500/10 p-2 rounded-xl">
+            <ShieldCheck className="w-4 h-4 text-red-500" />
+          </div>
+          <div>
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pacer Protocol</h4>
+            <p className="text-xs font-bold text-white mt-0.5">
+              {raceType === RaceType.BDM102 ? 'NO PACERS ALLOWED' : 'PACERS ALLOWED FROM KM 102'}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="bg-yellow-500/10 p-2 rounded-xl">
+            <Clock className="w-4 h-4 text-yellow-500" />
+          </div>
+          <div>
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Intermediate Cutoffs</h4>
+            <p className="text-xs font-bold text-white mt-0.5">KM 50: 9h | KM 102: 18h</p>
           </div>
         </div>
       </div>

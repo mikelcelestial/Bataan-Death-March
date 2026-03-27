@@ -4,7 +4,7 @@ import { RACE_DATA } from '../constants';
 import { RouteMarker, RaceType } from '../types';
 import { CacheService } from '../services/cacheService';
 import { GPXService } from '../services/gpxService';
-import { Info, Navigation, Trophy, Ruler, WifiOff, CloudDownload, CheckCircle2, Download } from 'lucide-react';
+import { Info, Navigation, Trophy, Ruler, WifiOff, CloudDownload, CheckCircle2, Download, Users } from 'lucide-react';
 
 interface MapDisplayProps {
   raceType: RaceType;
@@ -123,7 +123,19 @@ const MapDisplay: React.FC<MapDisplayProps> = ({ raceType }) => {
           </div>
           <div className="flex-shrink-0 flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-bold">{raceType === RaceType.BDM102 ? '18:00' : '30:00'} CUTOFF</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-500 font-bold uppercase leading-none">Cutoffs</span>
+              <span className="text-xs font-bold text-white mt-1">50K: 9h | 102K: 18h</span>
+            </div>
+          </div>
+          <div className="flex-shrink-0 flex items-center gap-2 bg-purple-500/10 px-3 py-1.5 rounded-lg border border-purple-500/30">
+            <Users className="w-4 h-4 text-purple-500" />
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-500 font-bold uppercase leading-none">Pacers</span>
+              <span className="text-xs font-bold text-white mt-1">
+                {raceType === RaceType.BDM102 ? 'NONE' : 'FROM 102K'}
+              </span>
+            </div>
           </div>
           <div className="flex-shrink-0 flex items-center gap-2 bg-green-500/10 px-3 py-1.5 rounded-lg border border-green-500/30">
             <Navigation className="w-4 h-4 text-green-500" />

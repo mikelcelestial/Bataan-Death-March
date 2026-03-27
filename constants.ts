@@ -23,35 +23,35 @@ export const BDM160_ROUTE: RouteMarker[] = [
 ];
 
 export const BDM102_CREW_TASKS: CrewInstruction[] = [
-  { km: 10, driverTask: 'Park at Cabcaben. Wait for runner to pass.', pacerTask: 'Prepare sponges and ice water.', foodPrep: 'Hand over first salt capsule.' },
-  { km: 31, driverTask: 'Leapfrog 5km ahead. Avoid traffic jams.', pacerTask: 'Check runner for chafing. Apply Vaseline.', foodPrep: 'Prepare cold Gatorade and 1/2 banana.' },
-  { km: 50, driverTask: 'Main rest stop setup. Open back of vehicle.', pacerTask: 'Get fresh shoes and socks ready.', foodPrep: 'Offer warm food (noodles/rice) if runner can eat.' },
-  { km: 70, driverTask: 'Drive slowly near runner (if permitted).', pacerTask: 'Pacer joins runner for next 10km.', foodPrep: 'Ice neck wrap change. High-caffeine gel ready.' },
-  { km: 92, driverTask: 'Head to the Finish Line area in San Fernando.', pacerTask: 'Last pacer switch. Moral support constant.', foodPrep: 'Victory drink on ice. Dry clothes ready.' }
+  { km: 10, driverTask: 'Park at Cabcaben. Wait for runner to pass.', pacerTask: 'NO PACERS ALLOWED. Prepare sponges and ice water.', foodPrep: 'Hand over first salt capsule.' },
+  { km: 31, driverTask: 'Leapfrog 5km ahead. Avoid traffic jams.', pacerTask: 'NO PACERS ALLOWED. Check runner for chafing.', foodPrep: 'Prepare cold Gatorade and 1/2 banana.' },
+  { km: 50, driverTask: 'Main rest stop setup. Open back of vehicle.', pacerTask: 'NO PACERS ALLOWED. 9-HOUR CUTOFF CHECK.', foodPrep: 'Offer warm food (noodles/rice) if runner can eat.' },
+  { km: 70, driverTask: 'Drive slowly near runner (if permitted).', pacerTask: 'NO PACERS ALLOWED. Monitor runner fatigue.', foodPrep: 'Ice neck wrap change. High-caffeine gel ready.' },
+  { km: 92, driverTask: 'Head to the Finish Line area in San Fernando.', pacerTask: 'NO PACERS ALLOWED. 18-HOUR CUTOFF CHECK.', foodPrep: 'Victory drink on ice. Dry clothes ready.' }
 ];
 
 export const BDM160_CREW_TASKS: CrewInstruction[] = [
-  { km: 20, driverTask: 'First major supply check.', pacerTask: 'Check hydration levels.', foodPrep: 'Hand over electrolyte drink.' },
-  { km: 50, driverTask: 'Full meal setup.', pacerTask: 'Check feet for blisters.', foodPrep: 'Warm meal (rice/soup).' },
-  { km: 102, driverTask: 'Psychological support station.', pacerTask: 'Pacer rotation starts.', foodPrep: 'High calorie snack.' },
-  { km: 130, driverTask: 'Night gear check (lights/reflectors).', pacerTask: 'Keep runner awake and moving.', foodPrep: 'Caffeine and warm drinks.' },
-  { km: 160, driverTask: 'Finish line celebration setup.', pacerTask: 'Final 5km push.', foodPrep: 'Recovery meal ready.' }
+  { km: 20, driverTask: 'First major supply check.', pacerTask: 'STRICTLY NO PACERS ALLOWED. Check hydration.', foodPrep: 'Hand over electrolyte drink.' },
+  { km: 50, driverTask: 'Full meal setup.', pacerTask: 'STRICTLY NO PACERS ALLOWED. 9-HOUR CUTOFF.', foodPrep: 'Warm meal (rice/soup).' },
+  { km: 102, driverTask: 'Psychological support station.', pacerTask: 'PACERS ALLOWED STARTING HERE. First pacer rotation. 18-HOUR CUTOFF.', foodPrep: 'High calorie snack.' },
+  { km: 130, driverTask: 'Night gear check (lights/reflectors).', pacerTask: 'Pacer rotation. Keep runner awake and moving.', foodPrep: 'Caffeine and warm drinks.' },
+  { km: 160, driverTask: 'Finish line celebration setup.', pacerTask: 'Final 5km push with pacer.', foodPrep: 'Recovery meal ready.' }
 ];
 
 export const BDM102_RACE_MILESTONES: RaceMilestone[] = [
   { km: 10, title: 'Early Fuel', action: 'Consume first 100kcal. Start electrolyte loading.', type: 'nutrition' },
   { km: 31, title: 'Heat Management', action: 'Apply ice to neck. Refill water with salt tabs.', type: 'hydration' },
-  { km: 50, title: 'Midpoint Refresh', action: 'Change socks/shoes. Check for hot spots or blisters.', type: 'gear' },
+  { km: 50, title: 'IMMEDIATE CUTOFF', action: '9-Hour Limit. Must leave Abucay before 9:00:00 elapsed.', type: 'mental' },
   { km: 70, title: 'Caffeine Boost', action: 'Strategic caffeine gel. Tighten mental focus.', type: 'nutrition' },
   { km: 85, title: 'Salt Check', action: 'Take extra salt. Muscle cramps usually peak here.', type: 'hydration' },
-  { km: 92, title: 'Final Push', action: 'Visualize the finish. Switch to 2:1 Run/Walk.', type: 'mental' }
+  { km: 102, title: 'FINAL CUTOFF', action: '18-Hour Limit. Finish before 18:00:00 elapsed.', type: 'mental' }
 ];
 
 export const BDM160_RACE_MILESTONES: RaceMilestone[] = [
   { km: 20, title: 'Foundation', action: 'Keep heart rate low. Eat small and often.', type: 'nutrition' },
-  { km: 50, title: 'First Third', action: 'Change socks. Re-apply anti-chafe.', type: 'gear' },
+  { km: 50, title: 'IMMEDIATE CUTOFF', action: '9-Hour Limit. Must pass KM 50 before 9:00:00 elapsed.', type: 'mental' },
   { km: 80, title: 'Night Prep', action: 'Prepare lights and reflective gear.', type: 'gear' },
-  { km: 102, title: 'The Wall', action: 'Original finish line. Stay focused on the next 58km.', type: 'mental' },
+  { km: 102, title: 'IMMEDIATE CUTOFF', action: '18-Hour Limit. Must pass KM 102 before 18:00:00 elapsed. Pacers allowed now.', type: 'mental' },
   { km: 130, title: 'Deep Night', action: 'Caffeine strategy. Focus on one foot in front of the other.', type: 'mental' },
   { km: 160, title: 'Immortality', action: 'The final stretch to Capas. Give it everything.', type: 'mental' }
 ];
@@ -73,14 +73,18 @@ export const RACE_DATA = {
     route: BDM102_ROUTE,
     crewTasks: BDM102_CREW_TASKS,
     milestones: BDM102_RACE_MILESTONES,
-    defaultPace: 7.5
+    defaultPace: 7.5,
+    startTime: '22:00', // 10 PM
+    pacerRule: 'NO PACERS ALLOWED'
   },
   [RaceType.BDM160]: {
     distance: 160,
     route: BDM160_ROUTE,
     crewTasks: BDM160_CREW_TASKS,
     milestones: BDM160_RACE_MILESTONES,
-    defaultPace: 8.5
+    defaultPace: 8.5,
+    startTime: '05:00', // 5 AM
+    pacerRule: 'PACERS ALLOWED FROM KM 102'
   }
 };
 
